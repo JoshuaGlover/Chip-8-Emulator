@@ -20,11 +20,14 @@ class Chip8():
 
         # 2D numpy array containing (R, G, B) values for each pixel
         self.pixels = np.zeros((WIDTH, HEIGHT, 3))
+        self.pixel_decay = 20
 
         # Create the CPU, load the fontset and game rom
         self.cpu = cpu.Cpu()
         self.cpu.load_file_to_memory("fontset.bin", 0x050)
         self.cpu.load_file_to_memory("roms/" + rom, 0x200)
+
+        self.cycles_per_frame = CYCLES_PER_FRAME
 
         # Keypad index translates PyGame key values to Chip-8 key values
         # Keys shown below as they appear on a standard keyboard
@@ -41,8 +44,15 @@ class Chip8():
         while self.playing:
             self.clock.tick(FPS)
 
+            # Simulate phosphor display
+            for i in range(WIDTH):
+                for j in range(HEIGHT):
+                    if self.pixels[i][j][0] != 0:
+                        curr_val = self.pixels[i][j][0]
+                        self.pixels[i][j] = tuple(max(curr_val - (255 - curr_val + self.pixel_decay), 0) for _ in range(3))
+
             # Run the specified number of cycles within the current frame
-            cycles_left = CYCLES_PER_FRAME
+            cycles_left = self.cycles_per_frame
             while cycles_left > 0:
                 self.events()
                 self.cpu.execute_cycle()
@@ -64,6 +74,22 @@ class Chip8():
                 self.cpu.keypad[self.keypad_index[event.key]] = 1
             if event.type == pg.KEYUP and event.key in self.keypad_index:
                 self.cpu.keypad[self.keypad_index[event.key]] = 0
+            if event.type == pg.KEYDOWN and event.key == pg.K_UP:
+                self.cycles_per_frame += 1
+                print("Cycles/Frame Increased to:", self.cycles_per_frame)
+            if event.type == pg.KEYDOWN and event.key == pg.K_DOWN:
+                self.cycles_per_frame -= 1
+                if self.cycles_per_frame < 1:
+                    self.cycles_per_frame = 1
+                print("Cycles/Frame Decreased to:", self.cycles_per_frame)
+            if event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
+                self.pixel_decay += 10
+                print("Pixel Decay Factor Increased to:", self.pixel_decay)
+            if event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
+                self.pixel_decay -= 10
+                if self.pixel_decay < 10:
+                    self.pixel_decay = 10
+                print("Pixel Decay Factor Decreased to:", self.pixel_decay)
 
     def draw(self):
         """ Draws the updated sprites to the screen """
@@ -72,8 +98,8 @@ class Chip8():
             for j in range(HEIGHT):
                 if self.cpu.display[i][j] == 1:
                     self.pixels[i][j] = WHITE
-                else:
-                    self.pixels[i][j] = BG_COLOUR
+                # else:
+                #     self.pixels[i][j] = BG_COLOUR
 
         # Clear the screen
         self.screen.fill(BG_COLOUR)
