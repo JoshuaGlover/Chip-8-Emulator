@@ -1,4 +1,4 @@
-# Project Title
+# Python Chip-8 Emulator
 
 A Chip-8 Emulator developed in Python using PyGame. The purpose of this project was to learn about emulation and gain experience using test driven development. 
 
