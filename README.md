@@ -1,12 +1,16 @@
-# Python Chip-8 Emulator
+# Chip-8 Emulator with Flicker Reduction
 
 A Chip-8 Emulator developed in Python using PyGame. The purpose of this project was to learn about emulation and gain experience using test driven development. 
 
-![](demo.gif)
+This emulator includes the ability to reduce flickering by simulating the behaviour of old phosphor displays. Since the pixels of phosphor displays glow for several milliseconds after being turned off, they display a slightly dim sprite rather than a flickering one but increases the appearance of ghosting. 
+
+![](phosphor_demo.gif)
+
+Here is the flickering that would occur without any flicker reduction.
+
+![](flicker_demo.gif)
 
 The flickering you see is an accurate emulation of Chip-8. The flickering is due to having a single draw instruction which is used for both drawing and undrawing pixels. For example, a moving paddle is first undrawn and then drawn in a new location. Since the game is essentially a free running loop, drawing can run out of sync with the refresh rate of the display causing the screen to frequently display undrawn sprites.
-
-One potential solution to this is emulating the old phosphor displays Chip-8 games used to display on. Since the pixels of phosphor displays glow for several milliseconds after being turned off, they display a slightly dim sprite rather than a flickering one. This feature will be a future addition to this project. To see it in action check out [Faizilham's blog post](https://faizilham.github.io/revisiting-chip8) of his implementation in Rust.
 
 ## Getting Started
 
@@ -49,13 +53,32 @@ python3 main.py -r <rom_filename>
 
 Include the -f flag to launch the emulator in fullscreen. The repository includes three games, pong.ch8, tetris.ch8 and breakout.ch8.
 
-## Upcoming Additions
+## Controls
+
+### Gamepad
+
+|   |   |   |   |
+|:-:|:-:|:-:|:-:|
+| 1 | 2 | 3 | 4 |
+| Q | W | E | R |
+| A | S | D | F |
+| Z | X | C | V |
+|   |   |   |   |
+
+### Emulation Speed
+
+* UP Arrow: Increase Emulation Speed
+* DOWN Arrow: Decrease Emulation Speed
+
+### Flicker Reduction
+
+* RIGHT Arrow: Increase Pixel Decay Factor
+* LEFT Arrow: Decrease Pixel Decay Factor
+
+## Future Features
 
 * Wait for Keypress Instruction
-* Emulation of phosphor display to reduce flickering
 * Keys to control emulation:
-  * Speed up emulation
-  * Slow down emulation
   * Pause emulator
   * Restart emulator
 
