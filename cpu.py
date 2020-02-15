@@ -62,9 +62,6 @@ class Cpu():
         # Display
         self.display = np.zeros((WIDTH, HEIGHT))
 
-        # Draw flag
-        self.draw_flag = False
-
         # Operation Lookup Table
         self.operation_lookup = {
             0x0: self.clear_or_return,
@@ -277,8 +274,6 @@ class Cpu():
                     self.V[0xF] = 1
 
                 self.display[x][y] = int(self.display[x][y]) ^ int(bm.extract_bit((width - 1) - dx, self.memory[self.I + dy]))
-
-        self.draw_flag = True
 
     def key_operation(self):
         """ Decodes keypad opcodes (MSB of E) and calls relevant function """

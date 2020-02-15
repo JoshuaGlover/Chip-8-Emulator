@@ -44,13 +44,6 @@ class Chip8():
         while self.playing:
             self.clock.tick(FPS)
 
-            # Simulate phosphor display
-            for i in range(WIDTH):
-                for j in range(HEIGHT):
-                    if self.pixels[i][j][0] != 0:
-                        curr_val = self.pixels[i][j][0]
-                        self.pixels[i][j] = tuple(max(curr_val - (255 - curr_val + self.pixel_decay), 0) for _ in range(3))
-
             # Run the specified number of cycles within the current frame
             cycles_left = self.cycles_per_frame
             while cycles_left > 0:
@@ -58,10 +51,7 @@ class Chip8():
                 self.cpu.execute_cycle()
                 cycles_left -= 1
 
-            # Only draw if the CPU sets the draw flag
-            if self.cpu.draw_flag:
-                self.cpu.draw_flag = False
-                self.draw()
+            self.draw()
 
     def events(self):
         """ Listens for events bound to terminating the game or keypad inputs """
@@ -93,13 +83,18 @@ class Chip8():
 
     def draw(self):
         """ Draws the updated sprites to the screen """
+        # Simulate phosphor display
+        for i in range(WIDTH):
+            for j in range(HEIGHT):
+                if self.pixels[i][j][0] != 0:
+                    curr_val = self.pixels[i][j][0]
+                    self.pixels[i][j] = tuple(max(curr_val - (255 - curr_val + self.pixel_decay), 0) for _ in range(3))
+
         # Converts display (binary) to pixel values (R, G, B)
         for i in range(WIDTH):
             for j in range(HEIGHT):
                 if self.cpu.display[i][j] == 1:
                     self.pixels[i][j] = WHITE
-                # else:
-                #     self.pixels[i][j] = BG_COLOUR
 
         # Clear the screen
         self.screen.fill(BG_COLOUR)
